@@ -1,0 +1,6 @@
+Feature Ideas: 
+
+-darkmode/alt color pallete
+-unsubmit button
+    -files are checked when being submitted to ensure that work was done and the file is not blank
+-studio for creating assignments (like essays) with a dropdown for a direct assignment submission
