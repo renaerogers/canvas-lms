@@ -54,6 +54,7 @@ describe CoursesController do
       expect(assigns[:future_enrollments]).not_to be_nil
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
     end
 
     it "does not duplicate enrollments in variables" do
@@ -2433,6 +2434,20 @@ describe CoursesController do
           get "show", params: { id: @course.id }
           expect(assigns[:js_env][:TAB_CONTENT_ONLY]).to be_falsy
         end
+      end
+
+      it "includes args in ENV.TABS for nav_menu_link tabs" do
+        # Important because args is used in K5Course.jsx for nav_menu_link_* tabs
+        link = NavMenuLink.create!(context: @course, course_nav: true, url: "https://example.com", label: "My Link")
+        user_session(@teacher)
+
+        get "show", params: { id: @course.id }
+
+        tabs = assigns[:js_env][:TABS]
+        nav_tab = tabs.find { |t| t[:id] == NavMenuLinkTabs.numeric_id_to_tab_json_id(link.id) }
+        expect(nav_tab).not_to be_nil
+        expect(nav_tab[:args]).to eql(["https://example.com"])
+        expect(nav_tab[:href]).to be(NavMenuLinkTabs::TAB_HREF_VALUE)
       end
 
       describe "update" do
